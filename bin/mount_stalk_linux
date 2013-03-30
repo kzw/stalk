@@ -1,0 +1,29 @@
+#!/usr/bin/python -t
+import sys
+import re
+import subprocess
+import os
+
+if sys.argv[1] != 'Stalk':
+    print 'wrong device'
+    sys.exit(1)
+mount = sys.argv[2]
+options= sys.argv[4].split(',')
+args=['/usr/bin/stem']
+if options[0] == 'ro':
+    args.append('-r')
+config_pat = re.compile('config=(.+)')
+for o in options[1:]:
+    mat = config_pat.match(o)
+    if mat:
+        args.append('-c')
+        args.append(mat.group(1))
+    elif o == 'debug':
+        args.append('-d')
+    elif o == 'verbose':
+        args.append('-v')
+    elif o == 'allow_other':
+        args.append('-a')
+args.append(mount)
+os.environ['PATH'] = os.environ['SAVED_PATH']
+subprocess.call(args,env=os.environ)

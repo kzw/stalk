@@ -1,0 +1,2 @@
+In addition to sqlite3_open not working, 'chown' will not work unless the mount user is not 'root' and you do not specified 'allow_other'
+in mounting.  This is not really a bug of 'stalk' but more of a limitation of fuse.

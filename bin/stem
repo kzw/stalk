@@ -1,0 +1,102 @@
+#!/usr/bin/python -t
+
+from optparse import OptionParser
+from logging.handlers import SysLogHandler, RotatingFileHandler
+
+import logging
+import sys
+import os
+import ConfigParser
+import stalk
+
+parser = OptionParser()
+
+parser.add_option("-c", dest="config", help=
+    "supply config path. Default is /etc/stalk.cf", metavar="STRING")
+parser.add_option("-r", dest="read_only",
+    action="store_true", default=False,
+    help="mount read only, rsync pull, and 1 level of files.  " +
+        "Default allows write and rsync push.")
+parser.add_option("-a", dest="allow_other", action="store_true",
+    default=False, help="allow other user usage.  " +
+        "If mounting by non-root, /etc/fuse.conf must also be modified")
+parser.add_option("-f", dest="fore_ground", action="store_true",
+    default=False, help="run the script in the foreground")
+parser.add_option("-v", dest="verbose", action="store_true",
+    default=False, help="output/log informational messages")
+parser.add_option("-d", dest="debug", action="store_true",
+    default=False, help="output/log debug messages")
+
+(options, args) = parser.parse_args()
+
+sys.stdout.flush()
+sys.stderr.flush()
+
+if options.debug:
+    lgLVL = logging.DEBUG
+elif options.verbose:
+    lgLVL = logging.INFO
+else:
+    lgLVL = logging.WARNING
+
+lgr = logging.getLogger(os.path.basename(__file__))
+root_lg = logging.getLogger()
+if os.path.exists('/dev/log'):
+    slh = SysLogHandler(address='/dev/log', facility=SysLogHandler.LOG_USER)
+    slh.setFormatter(logging.Formatter(
+        '%(asctime)s %(name)s %(levelname)s %(message)s'))
+    root_lg.addHandler(slh)
+else:
+    logging.basicConfig(level=lgLVL)
+
+root_lg.setLevel(lgLVL)
+
+if len(args) != 1:
+    lgr.warning('Usage: %s [ -d -v -c <config.json> -r -a -f -h] <mount point>'
+            % sys.argv[0])
+    sys.exit(1)
+
+config = options.config
+
+if not config:
+    config = '/etc/stalk.cf'
+
+lgr.info("using config file '%s'", config)
+
+if not os.path.isfile(config):
+    lgr.critical("config file '%s' does not exist" % config)
+    sys.exit(2)
+
+if not os.path.isdir(args[0]):
+    lgr.critical("mount point '%s' is not a directory" % args[0])
+    sys.exit(3)
+
+if os.path.ismount(os.path.realpath(args[0])):
+    lgr.critical("something is already mounted on '%s'" % args[0])
+    sys.exit(5)
+
+cf = ConfigParser.SafeConfigParser()
+try:
+    cf.read(config)
+except:
+    lgr.critical("config file '%s' not well formed" % config)
+    sys.exit(4)
+
+lg_pth = '/dev/null'
+
+if cf.has_option('global', 'log'):
+    lg_pth = cf.get('global', 'log')
+    out_h = RotatingFileHandler(filename=lg_pth, mode='a', maxBytes=1000000000)
+    out_h.setFormatter(logging.Formatter(
+        '%(asctime)s %(name)s %(levelname)s %(message)s'))
+    root_lg.addHandler(out_h)
+
+log_file = file(lg_pth, 'a')
+if options.fore_ground:
+    lgr.info("running in the foreground")
+else:
+    sys.stdin = open('/dev/null')
+    os.dup2(log_file.fileno(), sys.stderr.fileno())
+    os.dup2(log_file.fileno(), sys.stdout.fileno())
+
+stalk.mount(options, cf, args[0])

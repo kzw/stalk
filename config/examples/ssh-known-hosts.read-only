@@ -1,0 +1,26 @@
+[global]
+# 'cachedir' is the optional folder where you want your files to persist after umounting
+# If it is not specified, your files will disappear after umounting
+# 'log' is the optional log location.
+cachedir: /Users/me/git/fuse/cache
+log: /Users/me/git/fuse/logs/ssh
+
+[DEFAULT]
+# This time sets the amount of cachetime that applies by default to all files below
+# The smaller is the number, the more frequently your file will be rsynced to the local machine
+# If it is 0, the file will be rsynced every time you want to access or read it.
+cachetime: 600
+
+# below you specify a section for each file you would like to mount
+# the name of the section does not matter except that it should not be 'global' or 'DEFAULT'
+
+[file1]
+# 'name' is the file name you would like to appear locally
+# 'origin' is the remote file location 
+name: ssh_known_hosts
+origin: ssh-known-hosts:/etc/ssh/ssh_known_hosts
+
+
+[fileX]
+name: monthly-report.pdf
+origin: finance:/home/cfo/mr.pdf

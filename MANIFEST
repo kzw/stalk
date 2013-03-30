@@ -1,0 +1,16 @@
+bin/stem
+stalk/__init__.py
+stalk/ro.py
+stalk/rw/__init__.py
+stalk/rw/work.py
+stalk/rw/launch.py
+stalk/rw/null_plugin.py
+stalk/rw/base_plugin.py
+stalk/rw/command_plugin.py
+bin/mount.fuse.Stalk
+bin/mount_stalk_linux
+setup.py
+docs/README.md
+docs/stem.1.gz
+config/examples/internal_yum
+config/examples/ssh-known-hosts.read-only

@@ -1,0 +1,66 @@
+=head1 NAME
+
+stem - mount I<fuse.Stalk> folder
+
+=head1 SYNOPSIS
+
+=over
+
+=item stem [-f -r -v -d -c <path> -a ]  <mount point>
+
+=over
+
+=back
+
+=back
+
+=head1 DESCRIPTION
+
+This command mounts a I<stalk> folder.  If mounting as root, you can also mount it
+with the following command.  If not mounting as root, modify I</etc/fstab> with
+B<user> option
+
+=over
+
+=item mount -t fuse.Stalk <path/to/mount folder>
+
+=over
+
+=back
+
+=back
+
+=head1 OPTIONS
+
+=over
+
+=item B<-r>
+
+This option mounts the folder in read-only/rsync pull mode.
+
+=item B<-v>
+
+Log informational messages.
+
+=item B<-d>
+
+Log even more messages.  Most messages will be from the underlying I<fusepy> library.
+
+=item B<-f>
+
+Do not detach the command from the prompt.  Use it only for testing.  All log messages will display to the terminal
+
+=item B<-c>
+
+Supply the path to the config file.  If omitted, the default I</etc/stalk.cf> is used.
+
+=item B<-a>
+
+Allow other users access to the mounted folder.  If the mount user is non-root,
+I</etc/fuse.conf> also needs to be modified.
+
+=item B<-h>
+
+Display help. 
+
+=cut

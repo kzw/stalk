@@ -1,0 +1,28 @@
+[global]
+# the following time specified the amount time stalk waits when it detects write operations before it starts to do its rsync/trigger
+# stuff.  So if you specify 30 sec, you start to do a sequence of write operations, so long no there is no 30 s time gaps between
+# these operations, stalk will do nothing.  When you finish the write operations, it will do work only after 30 second of quiet time.
+# 'root' directory is where your files persist after you umount
+# log location is in addition to syslog
+timeout: 10
+root: /home/win/.internal_yum
+log: /home/win/fuse/logs/internal_yum
+
+[plugin]
+# the following makes use of a plugin supplied
+# In this command plugin, you supplied a system command followed by various arguments
+# the last argument will be the 'root' you specified above
+# 'name' is the python module name
+# 'command' can be either specified as absolute or relative format
+# for the rest of the options in this section only the values on the rest are taken
+# and supplied as options to the command
+name: command_plugin
+command: createrepo
+o: -q
+
+[target]
+# in the target section you specify where you would like rsync your root folder to
+# the keys below (oregon, virginia) helps you easily identify the targets but they are not used by stalk.  Only
+# the values the right matters
+oregon: host1:/var/lib/nginx/yum
+virginia: hostv:/var/www/yum

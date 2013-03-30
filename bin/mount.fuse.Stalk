@@ -1,0 +1,2 @@
+#!/bin/bash
+SAVED_PATH=$PATH mount_stalk_linux $@
