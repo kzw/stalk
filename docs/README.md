@@ -116,14 +116,15 @@ equivalent to `stem` command above
 
 assuming you have the following line in `/etc/fstab`
 
-		Stalk /etc/ssh/kh fuse.Stalk config=/etc/stalk/ssh.cf,allow_other,ro 1 2 
+		Stalk /etc/ssh/kh fuse.Stalk config=/etc/stalk/ssh.cf,allow_other,ro,noauto 1 2 
 
 The following options in `/etc/fstab` option column are understood by *stalk*:
 `ro`, `verbose`, `debug`, `config=<path>`, `allow_other`.  If `config` path is
 omitted the default is `/etc/stalk.cf`.  Other options are equivalent to `-r`,
 `-v`, `-d`, `-a` flags to `stem` command.  You can also put the standard `user` option in
 `/etc/fstab` to allow non-root user to do the mounting but also see the section
-for *FUSE* security.
+for *FUSE* security.  If `noauto` is omitted, you should also have `_netdev`
+option to prevent the system from mounting before network is available.
 
 Below is an example config file for mounting in the read-write mode.  At the heart
 of read-write mode is a file system mounted in a loopback mode with root and
