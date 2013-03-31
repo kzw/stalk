@@ -188,7 +188,7 @@ have any read access unless it is mounted with `allow_other` option for root
 and `user_allow_other` option for non-root.  To allow `user_allow_other`,
 `/etc/fuse.conf` must also adjusted.
 
-## plugin Specification
+## plugin specification
 
 In case the `command_plugin` supplied does not suit your need, a custom plugin
 can be written as a python class module and installed under
