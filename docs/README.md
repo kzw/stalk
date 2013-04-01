@@ -1,4 +1,4 @@
-# stalk  = fuse + rsync + plugins
+# stalk  = fuse + rsync + urllib + plugins
 
 *stalk* is a Python application that combines
 [FUSE](http://fuse.sourceforge.net/) with user defined trigger actions for file
@@ -18,7 +18,7 @@ most up to date read access.
   on local machines. 
 - solution 2: use cron  to periodically sync remote files to local machines
 - alternative solution: use *stalk* in read-only mode.  A file is fetched
-  using rsync when there is a read request on it.
+  using rsync or urllib when there is a read request on it.
  
 Things to note:
 
@@ -76,7 +76,7 @@ read-only folder which contains a lone file `ssh-known-hosts`.
 		cachetime: 600
 		[file1]
 		name: ssh_known_hosts
-		origin: ssh-known-hosts-server.example.com:/etc/ssh/ssh_known_hosts
+		origin: https://ssh-known-hosts-server.example.com/ssh_known_hosts
 
 In the read-only mode, `global` and `DEFAULT` sections are optional.  In the
 `global` section, the option `cachedir` specifies a cache-folder for the files
@@ -92,6 +92,9 @@ name of the local file and `origin` specifies the remote location.  They will
 be supplied to the rsync command as 
 
 		rsync <origin> <cachedir>/<name>
+if `origin` cannot be parsed as a url.  Otherwise, `origin` will be downloaded as
+
+		urllib.urlopen(origin>).read()
 Optionally a file section may contain `cachetime` option which will override
 any value specified `DEFAULT` section.  If no `cachetime` is found for a
 file, it is equivalent to zero `cachetime`.  Assuming the config file is located
