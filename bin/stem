@@ -43,8 +43,7 @@ lgr = logging.getLogger(os.path.basename(__file__))
 root_lg = logging.getLogger()
 if os.path.exists('/dev/log'):
     slh = SysLogHandler(address='/dev/log', facility=SysLogHandler.LOG_USER)
-    slh.setFormatter(logging.Formatter(
-        '%(asctime)s %(name)s %(levelname)s %(message)s'))
+    slh.setFormatter(logging.Formatter('%(name)s %(levelname)s %(message)s'))
     root_lg.addHandler(slh)
 else:
     logging.basicConfig(level=lgLVL)

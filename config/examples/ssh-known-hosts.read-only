@@ -18,7 +18,7 @@ cachetime: 600
 # 'name' is the file name you would like to appear locally
 # 'origin' is the remote file location 
 name: ssh_known_hosts
-origin: ssh-known-hosts:/etc/ssh/ssh_known_hosts
+origin: https://ssh-known-hosts.example.com/ssh_known_hosts
 
 
 [fileX]

@@ -2,7 +2,7 @@
 
 from distutils.core import setup
 
-version = '0.65'
+version = '0.66'
 
 classifiers = [
     "Topic :: Filesystem",

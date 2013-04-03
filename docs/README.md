@@ -94,11 +94,16 @@ be supplied to the rsync command as
 		rsync <origin> <cachedir>/<name>
 if `origin` cannot be parsed as a url.  Otherwise, `origin` will be downloaded as
 
-		urllib.urlopen(origin>).read()
+		urllib.urlretrieve(<origin>, <cacheddir>/<name>)
 Optionally a file section may contain `cachetime` option which will override
-any value specified `DEFAULT` section.  If no `cachetime` is found for a
-file, it is equivalent to zero `cachetime`.  Assuming the config file is located
-at `/etc/stalk/ssh.cf`, the command to mount is
+any value specified `DEFAULT` section.  If no `cachetime` is found for a file,
+it is equivalent to a hardcoded minimum `cachetime` of 60 s.  This value should
+be below the minimum time period you expect the remote file to change
+regularly.  In other words, if the file on the remote server changes every hour,
+the cachetime should be below 3600. It should also be well above the time it
+takes to download or rsync the remote file; this obviously depends on the
+network and the size of the file.     Assuming the config file is located at
+`/etc/stalk/ssh.cf`, the command to mount is
 
 		stem -r -c /etc/stalk/ssh.cf -a /etc/ssh/kh
 
@@ -218,7 +223,7 @@ library *fusepy* and `yum install` should install that rpm too.  For other rpm
 based system, run `make` command in the `docs` folder and get a binary rpm with
 the following command.
 
-            $ ./setup.py bdist_rpm
+            $ ./setup.py bdist_rpm  --requires fusepy
 
 ### Debian systems
 
@@ -235,6 +240,7 @@ folder)
 
             $ ./setup.py bdist_deb
 You will need `python-stdeb` package.
+
 ### tarball
 
 			http://repo.vrane.com/downloads/

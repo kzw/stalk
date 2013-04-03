@@ -12,11 +12,14 @@ import time
 import os
 import re
 import tempfile
+import urllib
+import urlparse
 
 lg = logging.getLogger(__name__)
 
 LOCK_ROOT = '/tmp/' 
 LOCK_PREP = '.stalk'
+MIN_CACHE_TIME = 60
 
 origin_bad_pat = re.compile('.*[/*]$')
 
@@ -63,6 +66,7 @@ class Stalk(LoggingMixIn, Operations):
 
         ''' determine origins from config'''
         self._origin = {}
+        self._rsync = {}
         for s in cf.sections():
             if not cf.has_option(s, 'name'):
                 lg.critical("file name not specified in section '%s'" % s)
@@ -77,11 +81,7 @@ class Stalk(LoggingMixIn, Operations):
             if not cf.has_option(s, 'origin'):
                 lg.critical("no origin specified in section'%s'", s)
                 sys.exit(11)
-            origin = cf.get(s, 'origin')     
-            if origin_bad_pat.match(origin):
-                lg.critical("origin '%s' must be a single file" % origin)
-                sys.exit(10)
-            self._origin[name] = origin
+
             if cf.has_option(s, 'cachetime'):
                 try:
                     self._cache_per_file[name] = cf.getint(s, 'cachetime')
@@ -89,6 +89,15 @@ class Stalk(LoggingMixIn, Operations):
                     lg.critical("Invalid cachetime %s for file '%s'" %
                         (cf.get(s, 'cachetime'), name))
                     raise
+            origin = cf.get(s, 'origin')
+            self._origin[name] = origin
+            splitted = urlparse.urlsplit(origin)
+            if splitted.scheme and splitted.netloc:
+                continue
+            self._rsync[name] = 1
+            if origin_bad_pat.match(origin):
+                lg.critical("origin '%s' must be a single file" % origin)
+                sys.exit(10)
 
         if not self._origin: 
             lg.critical("no files to mount")
@@ -101,19 +110,56 @@ class Stalk(LoggingMixIn, Operations):
         self._cdir = cachedir + '/'
         self._attr['/'] = dict(st_mode=(S_IFDIR | 0555), st_ctime=now,
             st_mtime=now, st_atime=now, st_nlink=2, st_size=cdir_st.st_size)
+        file_st = os.lstat('/etc/passwd')
+        self._default_file_mode = dict(st_mode=file_st.st_mode, st_ctime=now,
+            st_mtime=now, st_atime=now, st_nlink=1, st_size=1)
 
     def __del__(self):
         try:
             rmtree(self._lock_dir)
         except:
             lg.error("error removing lock dir '%s'" % self._lock_dir)
-            pass
         if self._tempcache:
             lg.info("deleting temp cache '%s'" % self._cdir)
             rmtree(self._cdir)
 
     def getattr(self, path, fh=None):
-        if '/' == path: return self._attr['/']
+        if '/' == path:
+            return self._attr['/']
+        bname = os.path.basename(path)
+        if not bname in self._origin:
+            raise FuseOSError(ENOENT)
+        if path in self._attr:
+            return self._attr[path]
+        path = self._cdir + path
+        if os.path.exists(path):
+            st = os.lstat(path)
+            return dict((k, getattr(st, k)) for k in ('st_atime',
+                'st_gid', 'st_mode', 'st_mtime', 'st_size',
+                'st_uid', 'st_nlink'))
+        return self._default_file_mode
+
+    def _download(self, name, _now):
+        origin = self._origin[name]
+        if name in self._rsync:
+            lg.info("calling rsync")
+            rv = call(['rsync', '-a', origin, self._cdir])
+            lg.info("rsync exit code is %d" % rv)
+            self._recent[name] = _now
+        else:
+            lg.info("using urllib to download file")
+            try:
+                urllib.urlretrieve(origin, os.path.join(self._cdir, name))
+            except Exception, e:
+                lg.error("failed to download file %s" % name)
+                lg.error(e)
+                return
+            self._recent[name] = _now
+            lg.info("file downloaded")
+
+    def _get_real_attr(self, path, fh=None):
+        if '/' == path:
+            return self._attr['/']
         bname = os.path.basename(path)
         if not bname in self._origin:
             raise FuseOSError(ENOENT)
@@ -123,25 +169,21 @@ class Stalk(LoggingMixIn, Operations):
             if bname in self._cache_per_file:
                 cachetime = self._cache_per_file[bname]
             else:
-                cachetime = 0
+                cachetime = MIN_CACHE_TIME
+            delta = now - recent
+            lg.info("delta is %d cachetime is %d" % (delta, cachetime))
+            if delta > cachetime:
+                self._download(bname, now)
         else:
-            recent = now
-            cachetime = 0
-        delta = now - recent
-        lg.info("delta is %d cachetime is %d" % (delta, cachetime))
-        if delta >= cachetime :
-            origin = self._origin[bname]
-            lg.info("calling rsync")
-            rv = call(['rsync', '-a', origin, self._cdir])
-            lg.info("rsync exit code is %d" % rv)
-            self._recent[bname] = now
+            self._download(bname, now)
+            lg.info("'%s' synced for the first time" % bname.encode("ascii","ignore") )
         st = os.lstat(self._cdir + path)
         self._attr[path] = dict((key, getattr(st, key)) for key in ('st_atime',
             'st_gid', 'st_mode', 'st_mtime', 'st_size', 'st_uid', 'st_nlink'))
         return self._attr[path]
 
     def read(self, path, size, offset, fh=None):
-        self._attr[path] = self.getattr(path)
+        self._attr[path] = self._get_real_attr(path)
         f = open(self._cdir + path, 'r')
         f.seek(offset, 0)
         buff = f.read(size)
