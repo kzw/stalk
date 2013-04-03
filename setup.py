@@ -22,7 +22,7 @@ setup(
     scripts = [ 'bin/stem', 'bin/mount_stalk_linux' ],
     packages = ['stalk', 'stalk.rw' ],
     data_files = [('/sbin',['bin/mount.fuse.Stalk']),
-       ('/usr/share/doc/' + fullname, ['docs/README.md']),
+       ('/usr/share/doc/' + fullname, ['README.md']),
         ('/usr/share/man/man1/', ['docs/stem.1.gz']),
         ('/etc/stalk/examples', ['config/examples/internal_yum',
         'config/examples/ssh-known-hosts.read-only'])],
