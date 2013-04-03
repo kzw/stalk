@@ -10,7 +10,7 @@ stalk/rw/command_plugin.py
 bin/mount.fuse.Stalk
 bin/mount_stalk_linux
 setup.py
-docs/README.md
+README.md
 docs/stem.1.gz
 config/examples/internal_yum
 config/examples/ssh-known-hosts.read-only
