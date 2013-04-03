@@ -147,7 +147,7 @@ Either `plugin` or `target` may be absent in a config file but not both.  In
 the example, both are present.  The `plugin` action takes place just before the
 `rsync` action.
 
-In the `plugin` section, `name` is the name of the plugin to be loaded.  Other
+In the `plugin` section, `name` is the python module name of the plugin to be loaded.  Other
 options in the section depend on the specific plugin being loaded.   In this
 example, `command_plugin` requires `command` and switches to be supplied to the
 `command`. In the example there is a single switch `-q` supplied to the
@@ -170,6 +170,9 @@ folder.
 		us-west-2: host1:/var/lib/nginx/yum
 		us-east-1: hostb.example.org:/var/www/yum
 
+The keys on the left in the `target` section are not used by *stalk* but they
+should aid you identify the targets.
+
 The following line in `/etc/fstab`
 
 		Stalk /home/me/internal_yum fuse.Stalk user,noauto 0 0
@@ -188,7 +191,7 @@ for each target.
 ## security control in FUSE
 
 The underlying FUSE system has security controls that can confuse the first
-time user.  For example, let say a user has a non-fuse folder and its contents with
+time user.  For example, consider a folder and its contents with
 permission that allows other users read access.  If the user mounts a fuse
 folder with the same mounted permission, other users (not even root) may not
 have any read access unless it is mounted with `allow_other` option for root
@@ -201,18 +204,18 @@ In case the `command_plugin` supplied does not suit your need, a custom plugin
 can be written as a python class module and installed under
 `/path/to/site-packages/stalk/rw` folder.  One can consult the module
 `command_plugin.py` in the same folder as an example.  It needs `run()` method
-which will call with `root` folder path as its lone argument.  The plugin
-should inherit from `BasePlugin` class in `stalk.rw.base_plugin` module;
+which is called with `root` folder path as its lone argument.  The plugin
+should inherit from `BasePlugin` class in `stalk.rw.base_plugin` module
 although it currently does not check this inheritance.
 
 ## compatibility
 
-python version 2.6 or higher is required to use *stalk*; it has been tested in
-linux with python versions 2.6 and 2.7 and Mac OS X with python 2.7.
+python version 2.6.6 or higher is required to use *stalk*; it has been tested in
+linux with python versions 2.6.6, 2.6.8, and 2.7 and Mac OS X with python 2.7.
 
 ## installation
 
-### Centos 6 variant systems (including EC2 with AWS supplied images)
+### Centos 6 variant systems (including EC2/AWS linux release from 2010 to 2013)
 
             $ sudo yum install http://repo.vrane.com/yum/c6/yum-repo.rpm
             $ sudo yum install stalk
@@ -253,15 +256,14 @@ github repo contains the latest code.
 ## credits
 
 *stalk* relies on [fusepy](https://github.com/terencehonles/fusepy) python
-module.  In fact, read-only mode is derived from `memory.py` example and
-read-write mode is based on `loopback.py` example.
+module.  In fact, it is based on `loopback.py` example in *fusepy*.
 
 ## bugs
 
 `sqlite3_open` in *sqlite3* C library does not work in read-write mode due to
 lack of `fcntl` support by the FUSE system.  An example python script that will
 produce this error is provided in `bug/` folder.  **TODO:** see if this script
-breaks other types of fuse mounted folders.
+is broken in other types of fuse mounted folders.
 
 `getxattr` is not supported and selinux will not work.
 
