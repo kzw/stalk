@@ -56,7 +56,7 @@ folder.
 >Write a python plugin that does this very specific task; writing to the folder
 will automatically trigger the plugin.
 
-*Other possible problems:*  Problem B + Problem C
+*Problem E:*  Problem B + Problem C
 
 >see the example below in the next section for rsync + shell command
 
@@ -92,7 +92,7 @@ be supplied to the rsync command as
 		rsync <origin> <cachedir>/<name>
 if `origin` cannot be parsed as a url.  Otherwise, `origin` will be downloaded as
 
-		urllib.urlretrieve(<origin>, <cacheddir>/<name>)
+		urllib.urlretrieve(<origin>, <cachedir>/<name>)
 Optionally a file section may contain `cachetime` option which will override
 any value specified `DEFAULT` section.  If no `cachetime` is found for a file,
 it is equivalent to a hardcoded minimum `cachetime` of 60 s.  This value should
