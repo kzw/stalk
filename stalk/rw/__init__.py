@@ -22,15 +22,13 @@ class Stalk(LoggingMixIn, Operations):
 
     def __init__(self, r, q, q1, vol):
         self._device = r
-        self._volume_name = vol if vol else self.__class__.__name__
+        if vol:
+            self.__class__.__name__ = vol
         self._queue = q
         self._ping_queue = q1
-        lg.info("creating fuse object")
+        lg.debug("creating fuse object")
         self.rwlock = Lock()
         self._last_ping = time.time()
-
-    def get_volume_name(self):
-        return self._volume_name
 
     def _rsync(self, rv):
         lg.debug("Calling rsync now")

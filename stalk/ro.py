@@ -27,7 +27,8 @@ class Stalk(LoggingMixIn, Operations):
     def __init__(self, cf, vol_name):
         self._attr = {}
         self._config = cf
-        self._volume_name = vol_name if vol_name else self.__class__._name__
+        if vol_name:
+            self.__class__.__name__ = vol_name
 
         ''' determine cache dir from config'''
         self._cache_per_file = {}
@@ -114,9 +115,6 @@ class Stalk(LoggingMixIn, Operations):
         self._default_file_mode = dict(st_mode=file_st.st_mode, st_ctime=now,
             st_mtime=now, st_atime=now, st_nlink=1, st_size=1)
 
-    def get_volume_name(self):
-        return self._volume_name
-
     def __del__(self):
         try:
             rmtree(self._lock_dir)
@@ -154,7 +152,7 @@ class Stalk(LoggingMixIn, Operations):
             try:
                 urllib.urlretrieve(origin, os.path.join(self._cdir, name))
             except Exception, e:
-                lg.error("failed to download file %s" % name)
+                lg.error("failed to download file %s" % name.encode('ascii', 'ignore') )
                 lg.error(e)
                 return
             self._recent[name] = _now

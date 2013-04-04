@@ -1,29 +1,43 @@
 #!/usr/bin/python -t
-import sys
-import re
+from optparse import OptionParser
+from platform import system
 import subprocess
 import os
+import re
 
-if sys.argv[1] != 'Stalk':
-    print 'wrong device'
-    sys.exit(1)
-mount = sys.argv[2]
-options= sys.argv[4].split(',')
+is_linux = system() == 'Linux'
+opt_parser = OptionParser()
+
+if is_linux:
+    opt_parser.add_option('-o', dest='opt')
+else:
+    opt_parser.add_option('-o', dest='opt', action='append')
+
+(options, args) = opt_parser.parse_args()
+mount = args[1]
+if is_linux:
+    opts = dict( (o, 1) for o in options.opt.split(',') )
+else:
+    opts = dict( (o, 1) for o in options.opt )
+
 args=['/usr/bin/stem']
-if options[0] == 'ro':
+if 'ro' in opts:
     args.append('-r')
+if 'debug' in opts:
+    args.append('-d')
+if 'verbose' in opts:
+    args.append('-v')
+if 'allow_other' in opts:
+    args.append('-a')
+if 'foreground' in opts:
+    args.append('-f')
 config_pat = re.compile('config=(.+)')
-for o in options[1:]:
-    mat = config_pat.match(o)
-    if mat:
-        args.append('-c')
-        args.append(mat.group(1))
-    elif o == 'debug':
-        args.append('-d')
-    elif o == 'verbose':
-        args.append('-v')
-    elif o == 'allow_other':
-        args.append('-a')
+for o in opts:
+    mat= config_pat.match(o)
+    if not mat:
+        continue
+    args.append('-c')
+    args.append(mat.group(1))
 args.append(mount)
 os.environ['PATH'] = os.environ['SAVED_PATH']
 subprocess.call(args,env=os.environ)
