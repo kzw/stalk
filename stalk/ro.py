@@ -21,15 +21,14 @@ LOCK_ROOT = '/tmp/'
 LOCK_PREP = '.stalk'
 MIN_CACHE_TIME = 60
 
-origin_bad_pat = re.compile('.*[/*]$')
-
 class Stalk(LoggingMixIn, Operations):
 
 
-    def __init__(self, cf):
+    def __init__(self, cf, vol_name):
         self._attr = {}
         self._config = cf
-        
+        self._volume_name = vol_name if vol_name else self.__class__._name__
+
         ''' determine cache dir from config'''
         self._cache_per_file = {}
         if cf.has_option('global', 'cachedir'):
@@ -95,6 +94,7 @@ class Stalk(LoggingMixIn, Operations):
             if splitted.scheme and splitted.netloc:
                 continue
             self._rsync[name] = 1
+            origin_bad_pat = re.compile('.*[/*]$')
             if origin_bad_pat.match(origin):
                 lg.critical("origin '%s' must be a single file" % origin)
                 sys.exit(10)
@@ -113,6 +113,9 @@ class Stalk(LoggingMixIn, Operations):
         file_st = os.lstat('/etc/passwd')
         self._default_file_mode = dict(st_mode=file_st.st_mode, st_ctime=now,
             st_mtime=now, st_atime=now, st_nlink=1, st_size=1)
+
+    def get_volume_name(self):
+        return self._volume_name
 
     def __del__(self):
         try:

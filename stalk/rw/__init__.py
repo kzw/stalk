@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python -t
 
 from __future__ import with_statement
 from errno import EACCES
@@ -20,13 +20,17 @@ MIN_PING_REPORT = 2
 class Stalk(LoggingMixIn, Operations):
 
 
-    def __init__(self, r, q, q1, m):
+    def __init__(self, r, q, q1, vol):
         self._device = r
+        self._volume_name = vol if vol else self.__class__.__name__
         self._queue = q
         self._ping_queue = q1
         lg.info("creating fuse object")
         self.rwlock = Lock()
         self._last_ping = time.time()
+
+    def get_volume_name(self):
+        return self._volume_name
 
     def _rsync(self, rv):
         lg.debug("Calling rsync now")
@@ -47,7 +51,7 @@ class Stalk(LoggingMixIn, Operations):
             delta = now - self._last_ping 
             self._last_ping = now
             if delta > MIN_PING_REPORT:
-            	lg.info("ping count = %d" % ping_count)
+                lg.info("ping count = %d" % ping_count)
         return rv
 
 
@@ -58,7 +62,6 @@ class Stalk(LoggingMixIn, Operations):
         if not os.access(path, mode):
             raise FuseOSError(EACCES)
 
-    # TODO: test these two
     chmod = os.chmod
     chown = os.chown
 

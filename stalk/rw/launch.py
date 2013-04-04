@@ -11,18 +11,19 @@ from stalk.rw import Stalk
 
 lg = logging.getLogger(__name__)
 
-def launch(opt, cf, mn):
-    r = get_root(cf, mn)
+def launch(opt, cf, vol_name, mn):
+    r = _get_root(cf, mn)
     work_q = Queue() 
     ping_q = Queue()
     p = Process(target=stalk.rw.work.rsync_process,
                 args=(work_q, ping_q, cf, r, mn))
     p.daemon = True
     p.start()
-    FUSE(Stalk(r, work_q, ping_q, mn), mn, allow_other=opt.allow_other,
+    FUSE(Stalk(r, work_q, ping_q, vol_name), mn, allow_other=opt.allow_other,
                  foreground=opt.fore_ground)
 
-def get_root(cf, mountpoint):
+
+def _get_root(cf, mountpoint):
     if cf.has_option('global', 'root'):
         try:
             _root = os.path.realpath(cf.get('global', 'root'))
