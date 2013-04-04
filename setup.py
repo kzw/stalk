@@ -19,7 +19,7 @@ setup(
     author = 'K Z Win',
     author_email = 'kzw@happyw.info',
     license = 'GPL',
-    scripts = [ 'bin/stem', 'bin/mount_stalk_linux' ],
+    scripts = [ 'bin/stem', 'bin/mount_stalk' ],
     packages = ['stalk', 'stalk.rw' ],
     data_files = [('/sbin',['bin/mount.fuse.Stalk']),
        ('/usr/share/doc/' + fullname, ['README.md']),
