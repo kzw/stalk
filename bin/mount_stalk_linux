@@ -4,9 +4,6 @@ import re
 import subprocess
 import os
 
-if sys.argv[1] != 'Stalk':
-    print 'wrong device'
-    sys.exit(1)
 mount = sys.argv[2]
 options= sys.argv[4].split(',')
 args=['/usr/bin/stem']
