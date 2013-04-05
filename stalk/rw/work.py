@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python -t
 
 from Queue import Empty
 import sys

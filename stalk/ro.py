@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python -t
 
 from errno import ENOENT
 from stat import S_IFDIR

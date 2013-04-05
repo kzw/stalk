@@ -1,3 +1,5 @@
+#!/usr/bin/python -t
+
 from stalk.rw.base_plugin import BasePlugin
 import subprocess
 import logging
