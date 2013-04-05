@@ -73,13 +73,15 @@ class Stalk(LoggingMixIn, Operations):
                 sys.exit(13)
             name = cf.get(s, 'name')
             if os.path.dirname(name) != '':
-                lg.critical("filename '%s' contains directory parts" % name)
+                lg.critical("filename '%s' contains directory parts" %
+                    name.encode('ascii', 'ignore'))
                 sys.exit(14)
             if name in self._origin: 
                 lg.critical("'%s' is in at least two sections")
                 sys.exit(15)
             if not cf.has_option(s, 'origin'):
-                lg.critical("no origin specified in section'%s'", s)
+                lg.critical("no origin specified in section '%s'" %
+                    s.encode('ascii', 'encod'))
                 sys.exit(11)
 
             if cf.has_option(s, 'cachetime'):
@@ -97,7 +99,8 @@ class Stalk(LoggingMixIn, Operations):
             self._rsync[name] = 1
             origin_bad_pat = re.compile('.*[/*]$')
             if origin_bad_pat.match(origin):
-                lg.critical("origin '%s' must be a single file" % origin)
+                lg.critical("origin '%s' must be a single file" %
+                    origin.encode('ascii','ignore'))
                 sys.exit(10)
 
         if not self._origin: 
