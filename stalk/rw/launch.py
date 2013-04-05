@@ -33,11 +33,12 @@ def _get_root(cf, mountpoint):
         lg.critical("config file does not specify 'root'")
         sys.exit(1)
     if not os.path.isabs(_root):
-        lg.critical("root path '%s' is not absolute" % _root)
+        lg.critical("root path '%s' is not absolute" %
+            _root.encode('ascii', 'ignore'))
         sys.exit(2)
     if os.path.samefile(_root, mountpoint):
         lg.critical("root path '%s' and mountpoint '%s' are the same" %
-                        (_root, mountpoint))
+                        (_root.encode('ascii', 'ignore'), mountpoint))
         sys.exit(9)
     lg.info("root path is '%s'" % _root)
     if not _root.endswith('/'):

@@ -36,13 +36,16 @@ class Stalk(LoggingMixIn, Operations):
             self._tempcache = False
             cachedir = cf.get('global', 'cachedir')
             if os.path.ismount(cachedir):
-                lg.critical('something is mounted on %s' % cachedir)
+                lg.critical('something is mounted on %s' %
+                    cachedir.encode('ascii', 'ignore'))
                 sys.exit(5)
             if not os.path.isdir(cachedir):
-                lg.critical("'%s' is not a directory" % cachedir)
+                lg.critical("'%s' is not a directory" %
+                    cachedir.encode('ascii', 'ignore'))
                 sys.exit(6)
             if not os.path.isabs(cachedir):
-                lg.critical("'%s' is not absolute" % cachedir)
+                lg.critical("'%s' is not absolute" %
+                    cachedir.encode('ascii', 'ignore'))
                 sys.exit(7)
 
             if os.path.isdir(cachedir):
@@ -53,10 +56,12 @@ class Stalk(LoggingMixIn, Operations):
                     os.makedirs(lock_dir)
                     self._lock_dir = lock_dir
                 except:
-                    lg.critical("failed to create lock folder '%s'" % lock_dir)
+                    lg.critical("failed to create lock folder '%s'"
+                        % lock_dir.encode('ascii', 'ignore'))
                     raise
             else:
-                lg.critical("cachedir '%s' does not exist" % cachedir)
+                lg.critical("cachedir '%s' does not exist" %
+                    cachedir.encode('ascii', 'ignore'))
                 sys.exit(17)
         else:
             self._tempcache = True
