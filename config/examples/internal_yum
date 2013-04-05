@@ -7,6 +7,8 @@
 timeout: 10
 root: /home/win/.internal_yum
 log: /home/win/fuse/logs/internal_yum
+# uncomment the following line to turn make the volume in /etc/mtab as 'yum'
+#volume-name: yum
 
 [plugin]
 # the following makes use of a plugin supplied

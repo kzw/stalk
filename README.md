@@ -115,7 +115,7 @@ known-hosts file with a symlink:
 
 		cd /etc/ssh ; ln -sf kh/ssh-known-hosts
 
-An external mount helper for `linux` is also provided and the following is
+An external mount wrapper for `linux` is also provided and the following is
 equivalent to `stem` command above
 
 		$ sudo mount /etc/ssh/kh
@@ -188,6 +188,8 @@ and
 		rsync -aH --delete ~/.internal_yum <target>
 for each target. 
 
+
+
 ## security control in FUSE
 
 The underlying FUSE system has security controls that can confuse the first
@@ -252,6 +254,20 @@ github repo contains the latest code.
 
 			https://github.com/kzw/stalk
 
+### mount wrapper
+
+`mount` command can invoke external mount programs to mount filesystems.  The
+invocation syntax and the name and location of these external mount programs
+differ between linux and BSD system like Mac OS X.  On linux, `mount` executes
+the shell script `/sbin/mount.fuse.Stalk` which in turns executes
+`/usr/bin/mount_stalk`.  On Mac OS X 10.6 (OSX Fuse), it is enough to copy
+`mount.fuse.Stalk` to `/sbin/mount_fuse.Stalk` and it should work the same.  On
+Mac OS X 10.7, `mount` looks for `mount_fuse` in
+`/System/Library/Filesystems/fuse.fs/Contents/Resources/` and further
+investigation is needed.
+
+`mount_stalk` will parse the options correctly on linux and BSD (tested on Mac
+OS X 10.6 and 10.7)
 
 ## credits
 
@@ -267,11 +283,7 @@ is broken in other types of fuse mounted folders.
 
 `getxattr` is not supported and selinux will not work.
 
-In read-only/push mode, do not set cachetime to 0 or to the number of seconds lower than
-time it takes to sync the file otherwise multiple syncs of the file
-will take place with one request for its contents.  This mode is unsuitable for a
-file whose size is expected to change by orders of magnitude.
-
-## TODO
-
-See if the external mount helper for BSD is the same.
+In read-only/push mode, do not set cachetime to 0 or to the number of seconds
+lower than time it takes to sync the file otherwise multiple syncs of the file
+will take place with one request for its contents.  This mode is unsuitable for
+a file whose size is expected to change by orders of magnitude.
