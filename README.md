@@ -124,13 +124,18 @@ assuming you have the following line in `/etc/fstab`
 
 		Stalk /etc/ssh/kh fuse.Stalk config=/etc/stalk/ssh.cf,allow_other,ro,noauto 1 2 
 
-The following options in `/etc/fstab` option column are understood by *stalk*:
+The first column `Stalk` can be replaced with another more descriptive name
+upto 32 characters long; letters, numbers, - and = are allowed.  The second
+column is the mount point.  The third column describes the file system; it
+tells `mount` command to look for specific external mount helper program. The
+following options in `/etc/fstab` option column are understood by *stalk*:
 `ro`, `verbose`, `debug`, `config=<path>`, `allow_other`.  If `config` path is
 omitted the default is `/etc/stalk.cf`.  Other options are equivalent to `-r`,
-`-v`, `-d`, `-a` flags to `stem` command.  You can also put the standard `user` option in
-`/etc/fstab` to allow non-root user to do the mounting but also see the section
-for *FUSE* security.  If `noauto` is omitted, you should also have `_netdev`
-option to prevent the system from mounting before network is available.
+`-v`, `-d`, `-a` flags to `stem` command.  You can also put the standard `user`
+option in `/etc/fstab` to allow non-root user to do the mounting but also see
+the section for *FUSE* security.  If `noauto` is omitted, you should also have
+`_netdev` option to prevent the system from mounting before network is
+available.
 
 Below is an example config file for mounting in the read-write mode.  At the heart
 of read-write mode is a file system mounted in a loopback mode with root and
@@ -175,8 +180,11 @@ should aid you identify the targets.
 
 The following line in `/etc/fstab`
 
-		Stalk /home/me/internal_yum fuse.Stalk user,noauto 0 0
+		yum /home/me/internal_yum fuse.Stalk user,noauto 0 0
 will let a regular user `me` mount it with the command
+
+		mount yum
+or
 
 		mount ~/internal_yum
 assuming the default config file `/etc/stalk.cf`  Any write operations in the

@@ -2,7 +2,7 @@
 
 from distutils.core import setup
 
-version = '0.66'
+version = '0.67'
 
 classifiers = [
     "Topic :: Filesystem",
@@ -26,7 +26,6 @@ setup(
         ('/usr/share/man/man1/', ['docs/stem.1.gz']),
         ('/etc/stalk/examples', ['config/examples/internal_yum',
         'config/examples/ssh-known-hosts.read-only'])],
-    description = 'rsync + fuse',
-    long_description = 'fuse + rsync + plugin',
+    long_description = 'fuse + rsync + urllib + plugin',
     classifiers = classifiers,
 )

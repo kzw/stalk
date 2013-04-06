@@ -7,7 +7,14 @@ import re
 lg = logging.getLogger(__name__)
 
 def mount(opt, cfg, mnt): 
-    vol_name = _get_volume(cfg)
+    vol_name = opt.name
+    if vol_name:
+        vol_pat = re.compile('^[-\w=]{1,32}$')
+        if not vol_pat.match(vol_name):
+            lg.error(
+                "bad volume '%s'. regex is '^[-\w=]{1,32}$'" %
+                    vol_name.encode("ascii","ignore"))
+            vol_name = None
     if opt.read_only:
         from stalk.ro import Stalk
         FUSE(Stalk(cfg, vol_name), mnt, ro=True, allow_other=opt.allow_other,
@@ -16,13 +23,3 @@ def mount(opt, cfg, mnt):
         from stalk.rw.launch import launch
         launch(opt, cfg, vol_name, mnt)
 
-def _get_volume(cf):
-    if cf.has_option('global', 'volume-name'):
-        vol = cf.get('global', 'volume-name')
-        vol_pat = re.compile('^[-\w=]{1,32}$')
-        if vol_pat.match(vol):
-            return vol
-        else:
-            lg.error(
-                "bad device '%s'. regex is '^[-\w=]{1,32}$'" %
-                    vol.encode("ascii","ignore"))

@@ -11,6 +11,9 @@ import stalk
 
 parser = OptionParser()
 
+parser.add_option("-n", dest="name", help=
+    "specify volume name that appears in /etc/mtab or 'mount'",
+        metavar='STRING')
 parser.add_option("-c", dest="config", help=
     "supply config path. Default is /etc/stalk.cf", metavar="STRING")
 parser.add_option("-r", dest="read_only",

@@ -15,12 +15,17 @@ else:
 
 (options, args) = opt_parser.parse_args()
 mount = args[1]
+volume = args[0]
+
 if is_linux:
     opts = dict( (o, 1) for o in options.opt.split(',') )
 else:
     opts = dict( (o, 1) for o in options.opt )
 
 args=['/usr/bin/stem']
+if volume != 'Stalk':
+    args.append('-n')
+    args.append(volume)
 if 'ro' in opts:
     args.append('-r')
 if 'debug' in opts:

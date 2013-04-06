@@ -8,7 +8,7 @@ stalk/rw/null_plugin.py
 stalk/rw/base_plugin.py
 stalk/rw/command_plugin.py
 bin/mount.fuse.Stalk
-bin/mount_stalk_linux
+bin/mount_stalk
 setup.py
 README.md
 docs/stem.1.gz
