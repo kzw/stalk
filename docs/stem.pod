@@ -19,12 +19,13 @@ stem - mount I<fuse.Stalk> folder
 This command mounts a I<stalk> folder.  If mounting as root, you can also mount it
 with the following command.  
 
+=over
+
 mount -t fuse.Stalk <path/to/mount folder>
 
-If not mounting as root, modify I</etc/fstab> with
-B<user> option
-
 =over
+
+=back
 
 =back
 
