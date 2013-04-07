@@ -115,7 +115,7 @@ known-hosts file with a symlink:
 
 		cd /etc/ssh ; ln -sf kh/ssh-known-hosts
 
-An external mount helper for `linux` is also provided and the following is
+An external mount wrapper for `linux` is also provided and the following is
 equivalent to `stem` command above
 
 		$ sudo mount /etc/ssh/kh
@@ -124,13 +124,18 @@ assuming you have the following line in `/etc/fstab`
 
 		Stalk /etc/ssh/kh fuse.Stalk config=/etc/stalk/ssh.cf,allow_other,ro,noauto 1 2 
 
-The following options in `/etc/fstab` option column are understood by *stalk*:
+The first column `Stalk` can be replaced with another more descriptive name
+upto 32 characters long; letters, numbers, - and = are allowed.  The second
+column is the mount point.  The third column describes the file system; it
+tells `mount` command to look for specific external mount helper program. The
+following options in `/etc/fstab` option column are understood by *stalk*:
 `ro`, `verbose`, `debug`, `config=<path>`, `allow_other`.  If `config` path is
 omitted the default is `/etc/stalk.cf`.  Other options are equivalent to `-r`,
-`-v`, `-d`, `-a` flags to `stem` command.  You can also put the standard `user` option in
-`/etc/fstab` to allow non-root user to do the mounting but also see the section
-for *FUSE* security.  If `noauto` is omitted, you should also have `_netdev`
-option to prevent the system from mounting before network is available.
+`-v`, `-d`, `-a` flags to `stem` command.  You can also put the standard `user`
+option in `/etc/fstab` to allow non-root user to do the mounting but also see
+the section for *FUSE* security.  If `noauto` is omitted, you should also have
+`_netdev` option to prevent the system from mounting before network is
+available.
 
 Below is an example config file for mounting in the read-write mode.  At the heart
 of read-write mode is a file system mounted in a loopback mode with root and
@@ -175,8 +180,11 @@ should aid you identify the targets.
 
 The following line in `/etc/fstab`
 
-		Stalk /home/me/internal_yum fuse.Stalk user,noauto 0 0
+		yum /home/me/internal_yum fuse.Stalk user,noauto 0 0
 will let a regular user `me` mount it with the command
+
+		mount yum
+or
 
 		mount ~/internal_yum
 assuming the default config file `/etc/stalk.cf`  Any write operations in the
@@ -187,6 +195,8 @@ and
 
 		rsync -aH --delete ~/.internal_yum <target>
 for each target. 
+
+
 
 ## security control in FUSE
 
@@ -252,6 +262,20 @@ github repo contains the latest code.
 
 			https://github.com/kzw/stalk
 
+### mount wrapper
+
+`mount` command can invoke external mount programs to mount filesystems.  The
+invocation syntax and the name and location of these external mount programs
+differ between linux and BSD system like Mac OS X.  On linux, `mount` executes
+the shell script `/sbin/mount.fuse.Stalk` which in turns executes
+`/usr/bin/mount_stalk`.  On Mac OS X 10.6 (OSX Fuse), it is enough to copy
+`mount.fuse.Stalk` to `/sbin/mount_fuse.Stalk` and it should work the same.  On
+Mac OS X 10.7, `mount` looks for `mount_fuse` in
+`/System/Library/Filesystems/fuse.fs/Contents/Resources/` and further
+investigation is needed.
+
+`mount_stalk` will parse the options correctly on linux and BSD (tested on Mac
+OS X 10.6 and 10.7)
 
 ## credits
 
@@ -267,11 +291,7 @@ is broken in other types of fuse mounted folders.
 
 `getxattr` is not supported and selinux will not work.
 
-In read-only/push mode, do not set cachetime to 0 or to the number of seconds lower than
-time it takes to sync the file otherwise multiple syncs of the file
-will take place with one request for its contents.  This mode is unsuitable for a
-file whose size is expected to change by orders of magnitude.
-
-## TODO
-
-See if the external mount helper for BSD is the same.
+In read-only/push mode, do not set cachetime to 0 or to the number of seconds
+lower than time it takes to sync the file otherwise multiple syncs of the file
+will take place with one request for its contents.  This mode is unsuitable for
+a file whose size is expected to change by orders of magnitude.

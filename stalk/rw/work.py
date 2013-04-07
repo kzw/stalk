@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python -t
 
 from Queue import Empty
 import sys
@@ -28,14 +28,15 @@ def work(_q, _r, _remote_trgts, _plg=None):
         rv = subprocess.call(['rsync', '-aH', '--delete', _r, target])
         if 0 != rv:
             lg.error("failed to rsync for target '%s'. exit code %d" %
-		(target, rv))
+		(target.encode('ascii', 'ignore'), rv))
         else:
-            lg.info("rsync exit code 0 for '%s'" % target)
+            lg.info("rsync exit code 0 for '%s'" %
+                target.encode('ascii', 'ignore'))
 
 def _get_plugin(_c):
     ''' Load an optional plugin '''
     if _c.has_section('plugin'):
-        plug = _c.get('plugin', 'name')
+        plug = _c.get('plugin', 'name').encode('ascii')
         plug_pat = re.compile('^\w+$')
         if not plug_pat.match(plug):
             lg.error("invalid plugin name %s" % plug)

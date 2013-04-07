@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python -t
 
 from errno import ENOENT
 from stat import S_IFDIR
@@ -21,28 +21,31 @@ LOCK_ROOT = '/tmp/'
 LOCK_PREP = '.stalk'
 MIN_CACHE_TIME = 60
 
-origin_bad_pat = re.compile('.*[/*]$')
-
 class Stalk(LoggingMixIn, Operations):
 
 
-    def __init__(self, cf):
+    def __init__(self, cf, vol_name):
         self._attr = {}
         self._config = cf
-        
+        if vol_name:
+            self.__class__.__name__ = vol_name
+
         ''' determine cache dir from config'''
         self._cache_per_file = {}
         if cf.has_option('global', 'cachedir'):
             self._tempcache = False
             cachedir = cf.get('global', 'cachedir')
             if os.path.ismount(cachedir):
-                lg.critical('something is mounted on %s' % cachedir)
+                lg.critical('something is mounted on %s' %
+                    cachedir.encode('ascii', 'ignore'))
                 sys.exit(5)
             if not os.path.isdir(cachedir):
-                lg.critical("'%s' is not a directory" % cachedir)
+                lg.critical("'%s' is not a directory" %
+                    cachedir.encode('ascii', 'ignore'))
                 sys.exit(6)
             if not os.path.isabs(cachedir):
-                lg.critical("'%s' is not absolute" % cachedir)
+                lg.critical("'%s' is not absolute" %
+                    cachedir.encode('ascii', 'ignore'))
                 sys.exit(7)
 
             if os.path.isdir(cachedir):
@@ -53,10 +56,12 @@ class Stalk(LoggingMixIn, Operations):
                     os.makedirs(lock_dir)
                     self._lock_dir = lock_dir
                 except:
-                    lg.critical("failed to create lock folder '%s'" % lock_dir)
+                    lg.critical("failed to create lock folder '%s'"
+                        % lock_dir.encode('ascii', 'ignore'))
                     raise
             else:
-                lg.critical("cachedir '%s' does not exist" % cachedir)
+                lg.critical("cachedir '%s' does not exist" %
+                    cachedir.encode('ascii', 'ignore'))
                 sys.exit(17)
         else:
             self._tempcache = True
@@ -73,13 +78,15 @@ class Stalk(LoggingMixIn, Operations):
                 sys.exit(13)
             name = cf.get(s, 'name')
             if os.path.dirname(name) != '':
-                lg.critical("filename '%s' contains directory parts" % name)
+                lg.critical("filename '%s' contains directory parts" %
+                    name.encode('ascii', 'ignore'))
                 sys.exit(14)
             if name in self._origin: 
                 lg.critical("'%s' is in at least two sections")
                 sys.exit(15)
             if not cf.has_option(s, 'origin'):
-                lg.critical("no origin specified in section'%s'", s)
+                lg.critical("no origin specified in section '%s'" %
+                    s.encode('ascii', 'encod'))
                 sys.exit(11)
 
             if cf.has_option(s, 'cachetime'):
@@ -95,8 +102,10 @@ class Stalk(LoggingMixIn, Operations):
             if splitted.scheme and splitted.netloc:
                 continue
             self._rsync[name] = 1
+            origin_bad_pat = re.compile('.*[/*]$')
             if origin_bad_pat.match(origin):
-                lg.critical("origin '%s' must be a single file" % origin)
+                lg.critical("origin '%s' must be a single file" %
+                    origin.encode('ascii','ignore'))
                 sys.exit(10)
 
         if not self._origin: 
@@ -151,7 +160,7 @@ class Stalk(LoggingMixIn, Operations):
             try:
                 urllib.urlretrieve(origin, os.path.join(self._cdir, name))
             except Exception, e:
-                lg.error("failed to download file %s" % name)
+                lg.error("failed to download file %s" % name.encode('ascii', 'ignore') )
                 lg.error(e)
                 return
             self._recent[name] = _now

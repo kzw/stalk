@@ -6,7 +6,7 @@ stem - mount I<fuse.Stalk> folder
 
 =over
 
-=item stem [-f -r -v -d -c <path> -a ]  <mount point>
+=item stem [-n <vol/dev name> -f -r -v -d -c <path> -a]  <mount point>
 
 =over
 
@@ -17,12 +17,11 @@ stem - mount I<fuse.Stalk> folder
 =head1 DESCRIPTION
 
 This command mounts a I<stalk> folder.  If mounting as root, you can also mount it
-with the following command.  If not mounting as root, modify I</etc/fstab> with
-B<user> option
+with the following command.  
 
 =over
 
-=item mount -t fuse.Stalk <path/to/mount folder>
+mount -t fuse.Stalk <path/to/mount folder>
 
 =over
 
@@ -33,6 +32,10 @@ B<user> option
 =head1 OPTIONS
 
 =over
+
+=item B<-n>
+
+This option specifies volume name or device name that appears in the first column of I</etc/mtab> or the output of the B<mount> command with no arguments.
 
 =item B<-r>
 
