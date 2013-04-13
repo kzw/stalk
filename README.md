@@ -94,7 +94,7 @@ if `origin` cannot be parsed as a url.  Otherwise, `origin` will be downloaded a
 
 		urllib.urlretrieve(<origin>, <cachedir>/<name>)
 Optionally a file section may contain `cachetime` option which will override
-any value specified `DEFAULT` section.  If no `cachetime` is found for a file,
+any value specified in the `DEFAULT` section.  If no `cachetime` is found for a file,
 it is equivalent to a hardcoded minimum `cachetime` of 60 s.  This value should
 be below the minimum time period you expect the remote file to change
 regularly.  In other words, if the file on the remote server changes every hour,
@@ -105,7 +105,7 @@ network and the size of the file.     Assuming the config file is located at
 
 		stem -r -c /etc/stalk/ssh.cf -a /etc/ssh/kh
 
-In this example, `-a` flag lets other users access to the mount point, `-r`
+In this example, `-a` flag lets other users have access to the mount point, `-r`
 specifies the read-only option, `-c` specifies the config file and the
 `ssh-known-hosts` file will appear in the folder `/etc/ssh/kh`.  You can umount
 any `fuse` mounted folder with a regular `umount` command.   In a typical
