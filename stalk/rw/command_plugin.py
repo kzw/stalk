@@ -26,7 +26,7 @@ class StalkPlugin(BasePlugin):
         if 0 != subprocess.call(['which', command]):
             raise CommandNotFoundError("No such command in path")
         lg.info("found command in path using 'which' command")
-        # this restore the original python behavior
+        # this restores the original python behavior
         del os.environ['PATH']
 
         del dic['command']

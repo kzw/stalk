@@ -101,6 +101,7 @@ def rsync_process(_work_q, _ping_q, cf, root, mnt):
         lg.critical("No plugin nor targets supplied.  Nothing to do")
         sys.exit(20)
     work(_work_q, root, targets, plugin_obj)
+    # quiet means there is no work to do
     quiet = True 
     last_sync = time.asctime()
     while True:
