@@ -40,13 +40,12 @@ class Stalk(LoggingMixIn, Operations):
             pass
         self._queue.put(1)
         now = time.time()
+        delta = now - self._last_ping
         if 0 == ping_count:
-            delta = now - self._last_ping 
             if delta > WORK_PROC_TIME:
                 lg.warn("child process is blocked or dead")
                 self._last_ping = now 
         else:
-            delta = now - self._last_ping 
             self._last_ping = now
             if delta > MIN_PING_REPORT:
                 lg.info("ping count = %d" % ping_count)
