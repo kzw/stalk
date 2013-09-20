@@ -291,7 +291,7 @@ is broken in other types of fuse mounted folders.
 
 `getxattr` is not supported and selinux will not work.
 
-In read-only/push mode, do not set cachetime to 0 or to the number of seconds
+In read-only/pull mode, do not set cachetime to 0 or to the number of seconds
 lower than time it takes to sync the file otherwise multiple syncs of the file
 will take place with one request for its contents.  This mode is unsuitable for
 a file whose size is expected to change by orders of magnitude.
