@@ -240,16 +240,21 @@ the following command.
 
 Enter the following for Ubuntu 12 in `/etc/apt/sources.list`
 
-			deb http://repo.vrane.com/apt/ u12/
-Then
+			deb http://repo.vrane.com/apt/u12/ wheezy main
+Then, install the signing key as
+
+			$ curl https://m.vrane.com/gpg.txt |sudo apt-key add -
+and update the local cache as
 
 			$ sudo apt-get update
+and finally install as
+
 			$ sudo apt-get install stalk
 will install the necessary packages.  For other debian systems, the following
 command will build a deb file (after running a `make` command in the `docs`
 folder)
 
-            $ ./setup.py bdist_deb
+            $ ./setup.py --command-packages=stdeb.command bdist_deb
 You will need `python-stdeb` package.
 
 ### tarballs
