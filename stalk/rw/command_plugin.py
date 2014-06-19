@@ -16,6 +16,7 @@ lg = logging.getLogger(__name__)
 
 class StalkPlugin(BasePlugin):
 
+    _path = None
 
     def __init__(self, cf):
         dic = dict(cf.items('plugin'))
@@ -29,13 +30,20 @@ class StalkPlugin(BasePlugin):
         # this restores the original python behavior
         del os.environ['PATH']
 
+        # save it to use it later
+        self._path = os.environ['PATH']
+
         del dic['command']
         del dic['name']
-        self._command = [ command ] + [ v for v in dic.itervalues() ]
+        self._command = [command] + [v for (k, v) in sorted(dic.items())]
 
     def run(self, root=None):
+        # restore path in case external command needs it
+        os.environ['PATH'] = self._path
         rv = subprocess.call(self._command + [ root ])
         if rv != 0:
            lg.info("command exit code = %d" % rv)
         else:
            lg.info("command exit code = 0")
+        # this restores the original python behavior
+        del os.environ['PATH']
